@@ -7,7 +7,6 @@
  */
 export interface EnvironmentVariables {
   // Base Configuration
-  ENV: string;
   PORT: number;
 
   // Postgres Database

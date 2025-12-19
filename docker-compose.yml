@@ -1,0 +1,49 @@
+services:
+  api:
+    container_name: g4f-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4501:4501"
+    env_file:
+      - .env
+    environment:
+      # Override database config for Docker network
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: g4f
+    depends_on:
+      - postgres
+    command: node dist/main.js
+
+  postgres:
+    container_name: g4f-db
+    image: postgres:16-alpine
+    ports:
+      - "4502:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: g4f
+    volumes:
+      - g4f_postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: g4f-pgadmin
+    image: dpage/pgadmin4:latest
+    ports:
+      - "4503:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@g4f.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  g4f_postgres_data:
+  pgadmin_data:

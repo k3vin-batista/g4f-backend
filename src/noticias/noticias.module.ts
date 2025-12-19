@@ -5,9 +5,10 @@ import { NoticiasController } from '@noticias/noticias.controller';
 import { NoticiasService } from '@noticias/noticias.service';
 import { NoticiaRepository } from '@noticias/repositories/noticia.repository';
 import { INoticiaRepositoryToken } from '@noticias/repositories/noticia.repository.interface';
+import { SharedModule } from '@shared/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Noticia])],
+  imports: [TypeOrmModule.forFeature([Noticia]), SharedModule],
   controllers: [NoticiasController],
   providers: [
     NoticiasService,

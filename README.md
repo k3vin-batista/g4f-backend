@@ -1,115 +1,213 @@
-Backend API built with NestJS, PostgreSQL and TypeORM.
+# G4F Backend API
 
-This project is dockerized from the start and prepared for domain-driven development.
-
----
-
-## Tech Stack
-- Node.js 22
-- NestJS
-- TypeORM
-- PostgreSQL
-- Docker & Docker Compose
-- Swagger (OpenAPI)
+API RESTful desenvolvida em **NestJS**, utilizando **TypeORM**, **PostgreSQL** e **Redis**, com foco em boas práticas de arquitetura, organização por domínio, testes automatizados e infraestrutura via Docker.
 
 ---
 
-## Project Structure
+## Requisitos
 
-```txt
-src/
- ├─ core/        # Infrastructure and configuration
- ├─ shared/      # Shared utilities (cross-domain)
- ├─ app.module.ts
- └─ main.ts
-````
+Para rodar o projeto localmente, você precisa ter instalado:
 
-* `core`: database, config, and infrastructure concerns
-* `shared`: reusable cross-domain components
-* Domain folders will live directly under `src/`
+- Node.js **v22**
+- npm ou yarn
+- Docker e Docker Compose (opcional, mas recomendado)
 
 ---
 
-## Environment Configuration
+## Configuração de Ambiente
 
-Create a `.env` file based on `.env.example`:
+### Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto baseado no exemplo abaixo:
 
 ```env
+# Application
 PORT=4501
-ENV=development
 
+# Database
 DB_HOST=localhost
 DB_PORT=4502
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=g4f
-```
 
-> When running with Docker, database variables are overridden by Docker Compose.
+# Cache
+CACHE_DRIVER=in-memory
+# CACHE_DRIVER=redis
+REDIS_HOST=localhost
+REDIS_PORT=4504
+```
 
 ---
 
-## Running with Docker
+## Executando Localmente (sem Docker)
 
-### Build and start containers
+### Instalar dependências
+
+```bash
+npm install
+```
+
+---
+
+### Subir dependências (Postgres e Redis)
+
+Você pode subir apenas os serviços de infraestrutura:
+
+```bash
+docker compose up postgres redis -d
+```
+
+Ou usar seus próprios serviços locais.
+
+---
+
+### Rodar migrations
+
+```bash
+npm run migration:run
+```
+
+---
+
+### Iniciar a API
+
+```bash
+npm run start:dev
+```
+
+A API estará disponível em:
+
+```
+http://localhost:4501
+```
+
+---
+
+## Executando com Docker (Recomendado)
+
+### Subir toda a stack
 
 ```bash
 docker compose up --build
 ```
 
-### Services
+Isso irá iniciar:
 
-* API: [http://localhost:4501/](http://localhost:4501)
-* Swagger UI: [http://localhost:4501/docs](http://localhost:4501/docs)
-* PGAdmin: [http://localhost:4503/](http://localhost:4503)
-
-### PGAdmin credentials
-
-* Email: `admin@g4f.com`
-* Password: `admin`
-
-To register the database server in PGAdmin:
-
-* Host: `postgres`
-* Port: `5432`
-* Username: `postgres`
-* Password: `postgres`
-* Database: `g4f`
+- API → `http://localhost:4501`
+- PostgreSQL → `localhost:4502`
+- PGAdmin → `http://localhost:4503`
+- Redis → `localhost:4504`
 
 ---
 
-## Running locally (without Docker)
+### Acessar o PGAdmin
+
+- URL: `http://localhost:4503`
+- Email: `admin@g4f.com`
+- Senha: `admin`
+
+Para conectar ao banco:
+
+- Host: `postgres`
+- Port: `5432`
+- User: `postgres`
+- Password: `postgres`
+- Database: `g4f`
+
+---
+
+# Executando Testes
+
+### Testes unitários
 
 ```bash
-npm install
-npm run start:dev
-```
-
-Make sure your local Postgres is running and `.env` is correctly configured.
-
----
-
-## Database Migrations
-
-This project uses **TypeORM migrations**.
-
-* `synchronize` is disabled
-* Schema changes must be handled via migrations
-
-Migrations are located at:
-
-```
-src/core/database/migration
+npm run test
 ```
 
 ---
 
-## API Documentation
+### Testes E2E (BDD)
 
-Swagger is available at:
-
+```bash
+npm run test:e2e
 ```
-http://localhost:4501/docs
+
+Os testes E2E validam comportamentos como:
+
+- Criação de Notícias
+- Validação de payload
+- Respostas HTTP semânticas
+
+---
+
+## Migrations
+
+### Criar uma nova migration
+
+```bash
+npm run migration:generate -- src/core/database/migration/NomeDaMigration
+```
+
+### Rodar migrations
+
+```bash
+npm run migration:run
 ```
 
 ---
+
+## Estrutura do Projeto
+
+```txt
+src/
+├─ app.module.ts
+├─ main.ts
+│
+├─ core/
+│  └─ database/
+│     ├─ database.module.ts
+│     ├─ data-source.ts
+│     └─ migration/
+│
+├─ shared/
+│  ├─ shared.module.ts
+│  ├─ cache/
+│  ├─ pagination/
+│  └─ entities/
+│
+├─ noticias/
+│  ├─ dto/
+│  ├─ entities/
+│  ├─ repositories/
+│  ├─ noticias.controller.ts
+│  ├─ noticias.service.ts
+│  └─ noticias.module.ts
+│
+└─ test/
+   └─ noticias/
+```
+
+### Organização
+
+- **Core**: infraestrutura e configurações globais
+- **Shared**: componentes reutilizáveis (cache, paginação, base entities)
+- **Domains**: cada pasta representa um domínio isolado (ex: `noticias`)
+- **Test**: testes E2E seguindo metodologia BDD
+
+---
+
+## Cache
+
+A aplicação suporta cache de listagem utilizando:
+
+- **In-memory cache** (default)
+- **Redis**
+
+A troca de implementação é feita via variável de ambiente:
+
+```env
+CACHE_DRIVER=memory
+# ou
+CACHE_DRIVER=redis
+```

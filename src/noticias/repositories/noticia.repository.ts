@@ -20,8 +20,38 @@ export class NoticiaRepository implements INoticiaRepository {
     return this.repository.findOne({ where: { id } });
   }
 
-  async findAll(): Promise<Noticia[]> {
-    return this.repository.find();
+  async findPaginated({
+    page,
+    limit,
+    titulo,
+    descricao,
+  }: {
+    page: number;
+    limit: number;
+    titulo?: string;
+    descricao?: string;
+  }) {
+    const qb = this.repository.createQueryBuilder('noticia');
+
+    if (titulo) {
+      qb.andWhere('LOWER(noticia.titulo) LIKE LOWER(:titulo)', {
+        titulo: `%${titulo}%`,
+      });
+    }
+
+    if (descricao) {
+      qb.andWhere('LOWER(noticia.descricao) LIKE LOWER(:descricao)', {
+        descricao: `%${descricao}%`,
+      });
+    }
+
+    const [data, total] = await qb
+      .orderBy('noticia.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total };
   }
 
   async update(

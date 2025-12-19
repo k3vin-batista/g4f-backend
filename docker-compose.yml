@@ -5,25 +5,33 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "4501:4501"
-    env_file:
-      - .env
+      - '4501:4501'
+    depends_on:
+      - postgres
+      - redis
     environment:
-      # Override database config for Docker network
+      NODE_ENV: development
+
+      # API
+      PORT: 4501
+
+      # Database (override for docker network)
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: g4f
-    depends_on:
-      - postgres
-    command: node dist/main.js
+
+      # Cache
+      CACHE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
   postgres:
     container_name: g4f-db
     image: postgres:16-alpine
     ports:
-      - "4502:5432"
+      - '4502:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -35,7 +43,7 @@ services:
     container_name: g4f-pgadmin
     image: dpage/pgadmin4:latest
     ports:
-      - "4503:80"
+      - '4503:80'
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@g4f.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -44,6 +52,16 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  redis:
+    container_name: g4f-redis
+    image: redis:7-alpine
+    ports:
+      - '4504:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
 volumes:
   g4f_postgres_data:
   pgadmin_data:
+  redis_data:

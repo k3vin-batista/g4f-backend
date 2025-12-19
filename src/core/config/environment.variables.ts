@@ -15,4 +15,9 @@ export interface EnvironmentVariables {
   DB_USER: string;
   DB_PASSWORD: string;
   DB_NAME: string;
+
+  // Cache Configuration
+  CACHE_DRIVER: 'in-memory' | 'redis';
+  REDIS_HOST?: string;
+  REDIS_PORT?: number;
 }

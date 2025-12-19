@@ -49,4 +49,18 @@ export class RedisCacheService implements CacheService {
     await this.redis.del(key);
     this.logger.debug(`Deleted cache entry for key: ${key}`);
   }
+
+  async delByPrefix(prefix: string): Promise<void> {
+    this.logger.debug(`Deleting cache entries with prefix: ${prefix}`);
+    const keys = await this.redis.keys(`${prefix}*`);
+
+    if (keys.length > 0) {
+      this.logger.debug(
+        `Found ${keys.length} keys to delete with prefix: ${prefix}`,
+      );
+      await this.redis.del(...keys);
+    }
+
+    this.logger.debug(`Deleted cache entries with prefix: ${prefix}`);
+  }
 }

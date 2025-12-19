@@ -45,4 +45,15 @@ export class InMemoryCacheService implements CacheService {
     this.logger.debug(`Deleted cache entry for key: ${key}`);
     return Promise.resolve();
   }
+
+  delByPrefix(prefix: string): Promise<void> {
+    this.logger.debug(`Deleting cache entries with prefix: ${prefix}`);
+    for (const key of this.store.keys()) {
+      if (key.startsWith(prefix)) {
+        this.store.delete(key);
+      }
+    }
+    this.logger.debug(`Deleted cache entries with prefix: ${prefix}`);
+    return Promise.resolve();
+  }
 }

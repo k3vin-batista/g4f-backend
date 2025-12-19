@@ -24,8 +24,11 @@ export class NoticiasService {
     private readonly cache: CacheService,
   ) {}
 
-  create(dto: CreateNoticiaDto) {
-    return this.noticiaRepository.create(dto);
+  async create(dto: CreateNoticiaDto) {
+    const result = await this.noticiaRepository.create(dto);
+    await this.cache.delByPrefix('noticias');
+
+    return result;
   }
 
   async findAllPaginated(
@@ -84,12 +87,20 @@ export class NoticiasService {
     return noticia;
   }
 
-  update(id: string, dto: UpdateNoticiaDto) {
-    return this.noticiaRepository.update(id, dto);
+  async update(id: string, dto: UpdateNoticiaDto) {
+    const result = await this.noticiaRepository.update(id, dto);
+
+    await this.cache.delByPrefix('noticias');
+
+    return result;
   }
 
-  remove(id: string) {
-    return this.noticiaRepository.delete(id);
+  async remove(id: string) {
+    const deleteResult = await this.noticiaRepository.delete(id);
+
+    await this.cache.delByPrefix('noticias');
+
+    return deleteResult;
   }
 
   private buildCacheKey(params: {

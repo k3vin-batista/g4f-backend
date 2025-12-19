@@ -2,31 +2,21 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '@core/config/environment.variables';
-
-export const entityFiles = '*.entity{.ts,.js}';
-export const entitiesPath = [`${__dirname}/../../**/${entityFiles}`];
-export const migrationFiles = 'core/database/migration/*{.ts,.js}';
-export const migrationsPath = [`${__dirname}/../../${migrationFiles}`];
+import { createDatabaseConfig } from './database.config';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService<EnvironmentVariables>) => {
-        return {
-          type: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USER'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
-          synchronize: false,
-          migrationsRun: false,
-          entities: entitiesPath,
-          migrations: migrationsPath,
-        };
-      },
+      useFactory: (configService: ConfigService<EnvironmentVariables>) =>
+        createDatabaseConfig({
+          DB_HOST: configService.getOrThrow('DB_HOST'),
+          DB_PORT: String(configService.getOrThrow('DB_PORT')),
+          DB_USER: configService.getOrThrow('DB_USER'),
+          DB_PASSWORD: configService.getOrThrow('DB_PASSWORD'),
+          DB_NAME: configService.getOrThrow('DB_NAME'),
+        }),
     }),
   ],
 })

@@ -20,4 +20,11 @@ export interface EnvironmentVariables {
   CACHE_DRIVER: 'in-memory' | 'redis';
   REDIS_HOST?: string;
   REDIS_PORT?: number;
+
+  // Migrations
+  DB_RUN_MIGRATIONS: boolean;
+  DB_MIGRATION_LOCK_ID: number;
+  DB_MIGRATION_LOCK_MAX_RETRIES: number;
+  DB_MIGRATION_LOCK_RETRY_DELAY: number;
+  DB_MIGRATION_LOCK_TIMEOUT: number;
 }

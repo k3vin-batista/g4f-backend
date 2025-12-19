@@ -27,6 +27,13 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
 
+      # TyopeORM
+      DB_RUN_MIGRATIONS: 'true'
+      DB_MIGRATION_LOCK_ID: 23568912
+      DB_MIGRATION_LOCK_MAX_RETRIES: 3
+      DB_MIGRATION_LOCK_RETRY_DELAY: 3000
+      DB_MIGRATION_LOCK_TIMEOUT: 30000
+
   postgres:
     container_name: g4f-db
     image: postgres:16-alpine

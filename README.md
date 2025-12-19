@@ -31,6 +31,13 @@ DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=g4f
 
+# TypeORM Migrations
+DB_RUN_MIGRATIONS=true
+DB_MIGRATION_LOCK_ID=23568912
+DB_MIGRATION_LOCK_MAX_RETRIES=3
+DB_MIGRATION_LOCK_RETRY_DELAY=3000
+DB_MIGRATION_LOCK_TIMEOUT=30000
+
 # Cache
 CACHE_DRIVER=in-memory
 # CACHE_DRIVER=redis
@@ -100,6 +107,18 @@ Isso irá iniciar:
 - Redis → `localhost:4504`
 
 ---
+
+### Migrations
+
+As migrations são executadas automaticamente no startup da API.
+
+A execução é controlada via variável de ambiente:
+
+DB_RUN_MIGRATIONS=true
+
+
+O projeto não utiliza synchronize: true.
+Toda evolução de schema é feita via migrations manuais, executadas de forma controlada no bootstrap da aplicação.
 
 ### Acessar o PGAdmin
 

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
@@ -86,8 +85,6 @@ describe('Noticias - Create (BDD)', () => {
     const getResponse = await request(app.getHttpServer()).get(
       `/noticias/${noticiaId}`,
     );
-
-    console.log(noticiaId);
 
     expect(getResponse.status).toBe(404);
   });

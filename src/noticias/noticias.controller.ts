@@ -6,11 +6,13 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { NoticiasService } from './noticias.service';
 import { CreateNoticiaDto } from './dto/create-noticia.dto';
 import { UpdateNoticiaDto } from './dto/update-noticia.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ListNoticiasQueryDto } from './dto/list-noticias.query.dto';
 
 @ApiTags('Noticias')
 @Controller('noticias')
@@ -23,8 +25,8 @@ export class NoticiasController {
   }
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query() query: ListNoticiasQueryDto) {
+    return this.service.findAllPaginated(query);
   }
 
   @Get(':id')

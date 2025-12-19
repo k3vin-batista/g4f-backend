@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { INoticiaRepositoryToken } from '@noticias/repositories/noticia.repository.interface';
 import type { INoticiaRepository } from '@noticias/repositories/noticia.repository.interface';
 import { CreateNoticiaDto } from '@noticias/dto/create-noticia.dto';
@@ -19,8 +19,14 @@ export class NoticiasService {
     return this.noticiaRepository.findAll();
   }
 
-  findOne(id: string) {
-    return this.noticiaRepository.findById(id);
+  async findOne(id: string) {
+    const noticia = await this.noticiaRepository.findById(id);
+
+    if (!noticia) {
+      throw new NotFoundException('Noticia not found');
+    }
+
+    return noticia;
   }
 
   update(id: string, dto: UpdateNoticiaDto) {
